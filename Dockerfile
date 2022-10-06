@@ -13,3 +13,4 @@ RUN --mount=type=cache,target=/var/cache/apt \
 	  git
 RUN --mount=type=cache,target=/root/.cache/pip pip install git+https://github.com/openai/whisper.git@9e653bd
 COPY --from=models /models ~/.cache/whisper
+ENTRYPOINT ["whisper"]
