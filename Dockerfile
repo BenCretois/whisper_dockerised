@@ -1,13 +1,11 @@
-FROM debian:11-slim
-RUN apt update && apt install -y --no-install-recommends \
+FROM docker.io/library/python:3.9-slim
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt/lists \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -qy --no-install-recommends \
 	  ffmpeg \
-	  git \
-	  python3-pip \
-	  python3.9-full \
-	  && rm -rf /var/lib/apt/lists/*
-RUN mkdir /app
-WORKDIR /app
-RUN pip install git+https://github.com/openai/whisper.git
-
-# download language model ‘medium’
-RUN whisper no-such-file.wav --model medium || echo “ignore missing file error”
+	  git
+RUN --mount=type=cache,target=/root/.cache/pip pip install git+https://github.com/openai/whisper.git@9e653bd
+# https://github.com/openai/whisper/blob/9e653bd/whisper/__init__.py#L26
+ADD https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt ~/.cache/whisper/medium.pt
+#ADD https://openaipublic.azureedge.net/main/whisper/models/e4b87e7e0bf463eb8e6956e646f1e277e901512310def2c24bf0e11bd3c28e9a/large.pt ~/.cache/whisper/large.pt
